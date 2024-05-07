@@ -15,6 +15,8 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('title');
             $table->text('content');
+            // Activity Solution
+            $table->boolean('isActive')->default(true);
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
         });

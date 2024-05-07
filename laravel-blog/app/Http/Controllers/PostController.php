@@ -46,7 +46,8 @@ class PostController extends Controller
     public function index()
     {
         // This line will retrieve all records from the 'posts' table in the database.
-        $posts = Post::all();
+        // $posts = Post::all();
+        $posts = Post::where('isActive', true)->get();
         // This line returns a view named 'posts.index' and passes data to that view.
         // The with() method is used to pass data to the view, where the first argument is the name of the variable that will be avilable in the view, and the second argument is the data itself.
         return view('posts.index')->with('posts', $posts);
@@ -55,6 +56,7 @@ class PostController extends Controller
     // action that will return a view showing three random blog post
     public function welcome(){
         $posts = Post::inRandomOrder()
+        ->where('isActive', true)
         ->limit(3)
         ->get();
 
@@ -101,5 +103,42 @@ class PostController extends Controller
         else{
             return redirect('/login');
         }
+    }
+
+    // action that will edit the specific post
+    public function update(Request $request, $id)
+    {
+        $post = Post::find($id);
+        // if authenticated User's ID is the same as the post's user_id
+        if(Auth::user()->id == $post->user_id){
+            $post->title = $request->input('title');
+            $post->content = $request->input('content');
+            $post->save();
+        }
+        return redirect('/posts');
+    }
+
+    // action to delete the specific post
+    // public function destroy($id)
+    // {
+    //     $post = Post::find($id);
+
+    //     // if authenticated user's ID is the same as the post's user_id
+    //     if(Auth::user()->id == $post->user_id){
+    //         $post->delete();
+    //     }
+    //     return redirect('/posts');
+    // }
+
+    public function archive($id)
+    {
+
+        $post = Post::find($id);
+
+        if(Auth::user()->id == $post->user_id){
+            $post->isActive = false;
+            $post->save();
+        }
+        return redirect('/posts');
     }
 }

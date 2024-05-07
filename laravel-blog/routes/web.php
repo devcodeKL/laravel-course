@@ -31,6 +31,15 @@ Route::get('/posts/{id}', [PostController::class, 'show']);
 // Define a route that will return an edit form for a specific Post when a GET request is received at the /posts/{id}/edit endpoint.
 Route::get('/posts/{id}/edit', [PostController::class, 'edit']);
 
+// Define a route that will overwrite an existing post with matching URL parameter ID via PUT method
+Route::put('/posts/{id}', [PostController::class, 'update']);
+
+// Define a route that will delete a post of the matching URL parameter ID
+// Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+
+// Activity Solution
+Route::delete('/posts/{id}',[PostController::class,'archive']);
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

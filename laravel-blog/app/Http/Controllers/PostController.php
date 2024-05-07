@@ -60,4 +60,46 @@ class PostController extends Controller
 
         return view('welcome')->with('posts', $posts);
     }
+
+    // action for showing only the posts authored by authenticated user
+    public function myPosts()
+    {
+        // Checks if there is an authenticated user.
+        if(Auth::user()){
+            // Retrieves the post authored by the authenticated user.
+            $posts = Auth::user()->posts;
+            // Returns the 'posts.index' view and passed the retrieved posts to the view using 'with' method.
+            return view('posts.index')->with('posts', $posts);
+        }else{
+            // If there is no authenticated user, redirect the user to the '/login' route.
+            return redirect('/login');
+        }
+    }
+
+    // action that will return a view showing a specific post using the URL parameter $id to query for the database entry to be shown
+    public function show($id)
+    {
+        // Retrieves the post with the given "$id" from the find() method.
+        $post = Post::find($id);
+        // returns the 'posts.show' view and passed the retrieved post to the view using the 'with()' method
+        return view('posts.show')->with('post', $post);
+    }
+
+    // action that will return an edit form for a specific Post when a GET request is received at the /posts/{id}/edit endpoint.
+    public function edit($id){
+        // $post = Post::find($id);
+        $post = Post::findOrFail($id); //this will return 404 page if no records found. 
+        // return view('posts.edit')->with('post', $post);
+        
+        // Stretch Goals
+        if(Auth::user()){
+            if(Auth::user()->id == $post->user_id){
+                return view('posts.edit')->with('post', $post);
+            }
+            return redirect('/posts');
+        }
+        else{
+            return redirect('/login');
+        }
+    }
 }

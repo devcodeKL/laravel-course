@@ -21,6 +21,16 @@ Route::get('/posts', [PostController::class, 'index']);
 // Define a route that will return a view for the welcome page
 Route::get('/', [PostController::class, 'welcome']);
 
+// Define a route that will return a view containing only the authenticated user's posts
+Route::get('/myPosts', [PostController::class, 'myPosts']);
+
+// Define a route wherein a view showing a specific post with matching URL parameter ID will be returned to the user
+// Route parameters or wildcard are always enclosed within a curly braces and should consists of alphabetic characeters. Route parameters are injected into route callbacks/controllers based on their order.
+Route::get('/posts/{id}', [PostController::class, 'show']);
+
+// Define a route that will return an edit form for a specific Post when a GET request is received at the /posts/{id}/edit endpoint.
+Route::get('/posts/{id}/edit', [PostController::class, 'edit']);
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

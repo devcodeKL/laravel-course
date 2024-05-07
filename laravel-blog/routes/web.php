@@ -40,6 +40,15 @@ Route::put('/posts/{id}', [PostController::class, 'update']);
 // Activity Solution
 Route::delete('/posts/{id}',[PostController::class,'archive']);
 
+// Define a route that will call this like action when a PUT request is received at the /posts/{id}/like endpoint
+Route::put('/posts/{id}/like', [PostController::class, 'like']);
+
+// Define a route that will call the comment action when a POST request is received at the /posts/{id}/comment endpoint
+Route::post('/posts/{id}/comment', [PostController::class, 'comment']);
+
+// Define a route that will enable users to delete comments in posts
+Route::delete('/posts/{id}/{commentId}/delete', [PostController::class, 'deleteComment']);
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

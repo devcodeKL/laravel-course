@@ -16,4 +16,14 @@ class Post extends Model
         // The argument passed in the belongsTo passed, tells laravel which model the 'Post' belongs to.
         return $this->belongsTo('App\Models\User');
     }
+
+    public function likes()
+    {
+        return $this->hasMany('App\Models\PostLike');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany('App\Models\PostComment');
+    }
 }

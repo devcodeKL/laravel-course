@@ -52,4 +52,14 @@ class User extends Authenticatable
         // This tells Laravel which model to associate with the 'User' model
         return $this->hasMany('App\Models\Post');
     }
+    
+    public function likes()
+    {
+        return $this->hasMany('App\Models\PostLike');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany('App\Models\PostComment');
+    }
 }

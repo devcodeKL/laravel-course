@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 // Import the Post Model
 use App\Models\Post;
+// Import the PostLike Model
+use App\Models\PostLike;
+// Import the PostComment Model
+use App\Models\PostComment;
 
 // access the authenticaed user via the Auth facade
 // In Laravel, Auth facade provides a convenient way to interact with the authentication system and access information about the currently authenticated user.
@@ -83,8 +87,10 @@ class PostController extends Controller
     {
         // Retrieves the post with the given "$id" from the find() method.
         $post = Post::find($id);
-        // returns the 'posts.show' view and passed the retrieved post to the view using the 'with()' method
-        return view('posts.show')->with('post', $post);
+        // Retrieve all comments associated with a specific post id
+        $comments = PostComment::all()->where('post_id', $post->id);
+        // returns the 'posts.show' view, providing it with two pieces of data: the $post variable representing a specific post, and the $comments variable representing a collection of comments associated with that post using the 'with()' method
+        return view('posts.show')->with('post', $post)->with('comments', $comments);
     }
 
     // action that will return an edit form for a specific Post when a GET request is received at the /posts/{id}/edit endpoint.
@@ -130,6 +136,7 @@ class PostController extends Controller
     //     return redirect('/posts');
     // }
 
+    // Activity Solution
     public function archive($id)
     {
 
@@ -140,5 +147,64 @@ class PostController extends Controller
             $post->save();
         }
         return redirect('/posts');
+    }
+
+    // action on liking a specific post
+    public function like($id)
+    {
+        // retrieves the post with the given 'id' from the database
+        $post = Post::find($id);
+        // retrives the ID of the authenticated user
+        $user_id = Auth::user()->id;
+        // if authenticated user is not the post author
+        if($post->user_id != $user_id){
+            // checks if the authenticated user has already liked the post before by querying the likes relationship on the post object
+            if($post->likes->contains("user_id", $user_id)){
+                // delete the like made by this user to unlike this post
+                // If the user has already liked the post, it deletes the like record, effectively "unliking" the post
+                PostLike::where('post_id', $post->id)->where('user_id', $user_id)->delete();
+            }else{
+                // create a new like record to like a specific post
+                // instantiate a new PostLike object from the PostLike model.
+                $postLike = new PostLike;
+                // define the properties of the $postLike object
+                $postLike->post_id = $post->id;
+                $postLike->user_id = $user_id;
+
+                // save this postLike object in the database
+                $postLike->save();
+            }
+            return redirect("/posts/$id");
+        }
+    }
+
+    // action commenting on a specific post
+    public function comment(Request $request, $id)
+    {
+        $post = Post::find($id);
+        $user_id = Auth::user()->id;
+
+            $postComment = new PostComment;
+
+            $postComment->content = $request->input('content');
+            $postComment->post_id = $post->id;
+            $postComment->user_id = $user_id;
+
+            $postComment->save();
+            
+            return redirect("/posts/$id");
+        
+    }
+
+    // action deleting a comment associated with a specific post if the authenticated user is the owner of that comment
+    public function deleteComment($id, $commentId)
+    {
+        $comment = PostComment::find($commentId);
+
+        if(Auth::user()->id == $comment->user_id){
+            $comment->delete();
+        }
+
+        return redirect("/posts/$id");
     }
 }
